@@ -1,0 +1,10 @@
+logs*
+results*
+*.mat
+*.txt
+*.log
+*.tar.gz
+.nfs*
+experiments
+run_*.sh
+
