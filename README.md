@@ -13,7 +13,7 @@ The software was tested on Debian GNU/Linux 7.4 (wheezy)
 using MATLAB R2013a and GCC 4.4.
 
 
-Getting Started
+Getting started
 ---
 
 ```
