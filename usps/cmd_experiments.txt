@@ -1,0 +1,5 @@
+./experiments 5 1e-3 1e-3
+./experiments 10 1e-3 1e-3
+./experiments 20 1e-3 1e-3
+./experiments 50 1e-3 1e-3
+./experiments 100 1e-3 1e-3
