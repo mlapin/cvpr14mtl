@@ -4,10 +4,9 @@ Multitask Representation Learning
 This code was used to produce results reported in the following paper:
 
 Maksim Lapin, Bernt Schiele and Matthias Hein  
-**Scalable Multitask Representation Learning for Scene Classification**  
+[Scalable Multitask Representation Learning for Scene Classification](http://www.d2.mpi-inf.mpg.de/content/scalable-multitask-representation-learning-scene-classification-0)  
 In _IEEE Conference on Computer Vision and Pattern Recognition (CVPR)_, 2014
 
-Feel free to contact [Maksim Lapin](http://www.mpi-inf.mpg.de/~mlapin/)
 
 The software was tested on Debian GNU/Linux 7.4 (wheezy)
 using MATLAB R2013a and GCC 4.4.
@@ -26,15 +25,44 @@ showresults
 ```
 
 
+Playing with the precomputed kernels
+---
+
+Download the precomputed kernels:
+```
+cd matlab && make playkernels
+```
+
+At MATLAB prompt:
+```
+playground
+```
+You may need to recompile the STL-SDCA and MTL-SDCA solvers,
+see below for instructions.
+
+To download more kernels (excluding the ones from Xiao et al.), run:
+```
+cd matlab && make allkernels
+```
+
+
 Running experiments
 ---
 
 ##### STL-SDCA and MTL-SDCA solvers (mex code)
 ```
-cd mtlsdca && make
+cd mtlsdca && make clean && make
 ```
 If MATLAB is not found, edit the `Makefile` and set the path manually,  
 e.g. `MATLAB_PATH = /usr/lib/matlab-8.1`
+
+If Intel MKL is installed, specify the corresponding path in `INTEL_MKL_PATH`;  
+otherwise, MATLAB BLAS will be used.
+
+To disable verbose output from the solvers,
+comment out the following line in the Makefile and recompile:
+`STD_CXXFLAGS += -DVERBOSE`
+
 
 ##### USPS/MNIST experiments
 ```
@@ -45,6 +73,9 @@ and create a text file `cmd_experiments.txt`
 with commands that can be executed in parallel.
 MCR environment needs to be set up to run the commands,
 see `run_experiments.sh` for details.
+To learn more about working with the compiled MATLAB code, visit  
+http://www.mathworks.com/help/compiler/working-with-the-mcr.html
+
 
 ##### SUN397 experiments
 First, create the 10 splits.

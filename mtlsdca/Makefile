@@ -3,15 +3,31 @@
 SHELL = /bin/bash
 
 ARCH ?= glnxa64
-INTEL_MKL_PATH =
-#/opt/intel
+MATLAB_PATH ?= $(shell matlab -e | awk '/MATLAB=/ {print substr($$1,8)}')
+INTEL_MKL_PATH = /opt/intel
 
 SRC_DIR := src
 OBJ_DIR := obj
 MEX_DIR := mex
 
+# Check if MATLAB exists
+ifeq ($(wildcard $(MATLAB_PATH)),)
+$(error MATLAB not found.)
+endif
+MEX ?= $(MATLAB_PATH)/bin/mex
+
+# MATLAB 8.1 (R2013a) requires gcc-4.4
+CC = gcc
+CXX = g++
+ifneq ($(findstring 8.1,$(MATLAB_PATH)),)
 CC = gcc-4.4
 CXX = g++-4.4
+endif
+
+# Check if Intel MKL exists and reset the path if it doesn't
+ifeq ($(wildcard $(INTEL_MKL_PATH)/mkl/lib),)
+INTEL_MKL_PATH =
+endif
 
 STD_CXXFLAGS = $(CXXFLAGS)
 STD_CXXFLAGS += -std=c++0x
@@ -27,24 +43,19 @@ OBJ_CXXFLAGS += -c
 
 ifeq ($(ARCH),glnxa64)
 STD_CXXFLAGS += -D_GNU_SOURCE -fno-stack-protector
+STD_LDFLAGS += -L$(OBJ_DIR) -L$(MEX_DIR)
 STD_LDFLAGS += -Wl,--rpath,\$$ORIGIN/ -Wl,--as-needed -lpthread -lm
-endif
-
-MEX ?= mex
-MATLAB_PATH ?= $(strip $(shell test "$$(command -v '$(MEX)')" && \
-	$(MEX) -v 2>&1 | sed -n 's/.*MATLAB *= *\(.*\)/\1/gp'))
-
-ifeq ($(MATLAB_PATH),)
-$(error MATLAB not found.)
 endif
 
 # BLAS/LAPACK flags
 ifeq ($(INTEL_MKL_PATH),)
 # MATLAB BLAS
-STD_CXXFLAGS += -DBLAS_MATLAB -I$(MATLAB_PATH)/extern/include
+$(info MATLAB BLAS)
+STD_CXXFLAGS += -DBLAS_MATLAB
 BLAS_LIB = -lmwblas -lmwlapack
 else
 # Intel MKL BLAS
+$(info Intel MKL BLAS)
 STD_CXXFLAGS += -DBLAS_INTEL_MKL -DMKL_ILP64 -m64 \
 	-I$(INTEL_MKL_PATH)/mkl/include
 BLAS_LIB = -Wl,--start-group \
@@ -54,19 +65,15 @@ BLAS_LIB = -Wl,--start-group \
 	-Wl,--end-group -liomp5 -ldl
 endif
 
-MEX_ARCH = $(ARCH)
-MEX_CXXFLAGS = -I$(MATLAB_PATH)/extern/include
-MEX_LDFLAGS = -L$(OBJ_DIR) -L$(MEX_DIR)
-
-MEX_FLAGS = $(MEXFLAGS)
-MEX_FLAGS += -$(MEX_ARCH) CC='$(CC)' CXX='$(CXX)'
-MEX_FLAGS += CFLAGS='$$CFLAGS $(STD_CXXFLAGS)'
-MEX_FLAGS += CXXFLAGS='$$CXXFLAGS $(STD_CXXFLAGS)'
+STD_CXXFLAGS += -I$(MATLAB_PATH)/extern/include
+MEXFLAGS += -$(ARCH) CC='$(CC)' CXX='$(CXX)'
+MEXFLAGS += CFLAGS='$$CFLAGS $(STD_CXXFLAGS)'
+MEXFLAGS += CXXFLAGS='$$CXXFLAGS $(STD_CXXFLAGS)'
 
 ifeq ($(ARCH),glnxa64)
 MEX_SUFFIX := mexa64
-MEX_FLAGS += -largeArrayDims -DMATLAB_MEX_FILE $(if $(DEBUG), -g)
-MEX_FLAGS += LDFLAGS='$$LDFLAGS $(STD_LDFLAGS) -Wl,--rpath,\\\$$ORIGIN/'
+MEXFLAGS += -largeArrayDims -DMATLAB_MEX_FILE $(if $(DEBUG), -g)
+MEX_LDFLAGS += CXXLIBS='$$CXXLIBS $(STD_LDFLAGS) $(BLAS_LIB)'
 endif
 
 mex_src := $(shell find $(SRC_DIR)/mex -name "*.cc" -printf '%f\n')
@@ -80,8 +87,8 @@ obj_tgt := $(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%,$(obj_src:.cc=.o))
 all: $(obj_tgt) $(mex_tgt)
 
 $(MEX_DIR)/%.$(MEX_SUFFIX) : $(SRC_DIR)/mex/%.cc $(obj_tgt) $(MEX_DIR) LIOMP5
-	$(MEX) $(MEX_FLAGS) $(MEX_CXXFLAGS) $< $(MEX_LDFLAGS) \
-	-output $@ $(obj_tgt) $(BLAS_LIB)
+	$(MEX) $(MEXFLAGS) $< $(MEX_LDFLAGS) \
+	-output $@ $(obj_tgt)
 
 $(OBJ_DIR)/%.o : $(SRC_DIR)/%.cc $(SRC_DIR)/%.h $(OBJ_DIR)
 	$(CC) $(STD_CXXFLAGS) $(OBJ_CXXFLAGS) $< $(STD_LDFLAGS) -o $@

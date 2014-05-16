@@ -216,7 +216,7 @@ void run(const int nin, const mxArray* in[], const int in_next, const int nout,
     mexErrMsgIdAndTxt(errOutOfMemory, "Failed to allocate memory for A.");
   }
 
-  mxDims = {T, T};
+  mxDims[0] = T, mxDims[1] = T;
   mxArray *mxKw = mxCreateNumericArray(
     (mwSize) 2, mxDims, mxGetClassID(mxKx), mxREAL);
   if (mxKw == NULL) {
@@ -228,7 +228,7 @@ void run(const int nin, const mxArray* in[], const int in_next, const int nout,
     mexErrMsgIdAndTxt(errOutOfMemory, "Failed to allocate memory for Kz.");
   }
 
-  mxDims = {N, T};
+  mxDims[0] = N, mxDims[1] = T;
   mxArray *mxB = mxCreateNumericArray(
     (mwSize) 2, mxDims, mxGetClassID(mxKx), mxREAL);
   if (mxB == NULL) {

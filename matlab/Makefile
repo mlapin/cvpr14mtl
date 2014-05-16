@@ -17,7 +17,7 @@ MCC_FLAGS := -R -nodisplay -R -nosplash -v
 #===============================================================================
 
 .PHONY: movecache zipdiary clean cleanbin cleanmcc cleantxt \
-	ex exmtl r500 r100k
+	ex exmtl r500 r100k playkernels allkernels
 
 
 #-------------------------------------------------------------------------------
@@ -27,22 +27,24 @@ all:
 	@echo "usage: make <command>"
 	@echo
 	@echo "Experiments:"
-	@echo "   ex         Make experiments"
-	@echo "   exmtl      Make MTL experiments"
+	@echo "   ex          Make experiments"
+	@echo "   exmtl       Make MTL experiments"
 	@echo
 	@echo "Datasets (resized versions of the SUN397 dataset):"
-	@echo "   r500       Create the SUN397-R500 \
+	@echo "   r500        Create the SUN397-R500 \
 (the largest dimension is at most 500 pixels)"
-	@echo "   r100k      Create the SUN397-R100K \
+	@echo "   r100k       Create the SUN397-R100K \
 (total image area is at most 100K pixels)"
 	@echo
 	@echo "Cleanup:"
-	@echo "   movecache  Move cache folders around."
-	@echo "   zipdiary   Archive diary files."
-	@echo "   clean      Clean everything defined below."
-	@echo "   cleanbin   Clean binary (mcc compiled) files."
-	@echo "   cleanmcc   Clean mcc auxiliary files."
-	@echo "   cleantxt   Clean txt files."
+	@echo "   movecache   Move cache folders around."
+	@echo "   zipdiary    Archive diary files."
+	@echo "   clean       Clean everything defined below."
+	@echo "   cleanbin    Clean binary (mcc compiled) files."
+	@echo "   cleanmcc    Clean mcc auxiliary files."
+	@echo "   cleantxt    Clean txt files."
+	@echo "   playkernels Download kernels for the playground.m script."
+	@echo "   allkernels  Download all available precomputed kernels."
 
 
 #-------------------------------------------------------------------------------
@@ -113,3 +115,9 @@ cleanmcc:
 
 cleantxt:
 	rm -rf *.txt
+
+playkernels:
+	make/make_playkernels.sh
+
+allkernels:
+	make/make_allkernels.sh

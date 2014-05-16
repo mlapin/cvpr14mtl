@@ -36,4 +36,8 @@ resSplitAll;
 fprintf('\n');
 fprintf('Figure 1: SUN397 - top-K accuracies:\n\n');
 resTopKAccuracy;
+
+fprintf('\n');
+fprintf('Figure (web page): SUN397 - comparison with previous work:\n\n');
+resTeaserPlot;
 cd ..
