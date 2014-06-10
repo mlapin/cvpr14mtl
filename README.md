@@ -4,7 +4,7 @@ Multitask Representation Learning
 This code was used to produce results reported in the following paper:
 
 Maksim Lapin, Bernt Schiele and Matthias Hein  
-[Scalable Multitask Representation Learning for Scene Classification](http://www.d2.mpi-inf.mpg.de/content/scalable-multitask-representation-learning-scene-classification-0)  
+[Scalable Multitask Representation Learning for Scene Classification](https://www.mpi-inf.mpg.de/departments/computer-vision-and-multimodal-computing/research/object-recognition-and-scene-understanding/scalable-multitask-representation-learning-for-scene-classification)  
 In _IEEE Conference on Computer Vision and Pattern Recognition (CVPR)_, 2014
 
 
